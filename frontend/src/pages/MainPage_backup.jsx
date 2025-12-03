@@ -9,7 +9,7 @@ import {
   Settings,
   Computer,
   Calculator,
-  Beaker,
+  Flask,
   BookOpen,
   Brain
 } from 'lucide-react';
@@ -46,7 +46,7 @@ const MainPage = () => {
       id: 3,
       title: 'Track 3',
       course: 'Organic Chemistry II',
-      icon: Beaker,
+      icon: Flask,
       iconBg: '#F3E5F5',
       iconColor: '#9C27B0',
       updated: '3 days ago',
