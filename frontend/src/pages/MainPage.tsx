@@ -9,17 +9,31 @@ import {
   Settings,
   Computer,
   Calculator,
-  Flask,
+  Beaker,
   BookOpen,
-  Brain
+  Brain,
+  LucideIcon
 } from 'lucide-react';
-import './MainPage.css';
+import styles from './MainPage.module.css';
+
+interface Track {
+  id: number;
+  title: string;
+  course: string;
+  icon: LucideIcon;
+  iconBg: string;
+  iconColor: string;
+  updated: string;
+  progress: number;
+  favorite: boolean;
+}
+
+type TabType = 'recent' | 'favorites' | 'templates' | 'archive';
 
 const MainPage = () => {
-  const [activeTab, setActiveTab] = useState('recent');
+  const [activeTab, setActiveTab] = useState<TabType>('recent');
 
-  // 模拟课程数据
-  const tracks = [
+  const tracks: Track[] = [
     {
       id: 1,
       title: 'Track 1',
@@ -46,7 +60,7 @@ const MainPage = () => {
       id: 3,
       title: 'Track 3',
       course: 'Organic Chemistry II',
-      icon: Flask,
+      icon: Beaker,
       iconBg: '#F3E5F5',
       iconColor: '#9C27B0',
       updated: '3 days ago',
@@ -77,14 +91,14 @@ const MainPage = () => {
     }
   ];
 
-  const [favorites, setFavorites] = useState(
+  const [favorites, setFavorites] = useState<Record<number, boolean>>(
     tracks.reduce((acc, track) => {
       acc[track.id] = track.favorite;
       return acc;
-    }, {})
+    }, {} as Record<number, boolean>)
   );
 
-  const toggleFavorite = (id) => {
+  const toggleFavorite = (id: number) => {
     setFavorites(prev => ({
       ...prev,
       [id]: !prev[id]
@@ -92,42 +106,42 @@ const MainPage = () => {
   };
 
   return (
-    <div className="main-page">
+    <div className={styles['main-page']}>
       {/* 左侧导航栏 */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="logo">
-            <div className="logo-icon">
+      <aside className={styles.sidebar}>
+        <div className={styles['sidebar-header']}>
+          <div className={styles.logo}>
+            <div className={styles['logo-icon']}>
               <FileText size={24} />
             </div>
-            <span className="logo-text">Course Planner</span>
+            <span className={styles['logo-text']}>Course Planner</span>
           </div>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className={styles['sidebar-nav']}>
           <button
-            className={`nav-item ${activeTab === 'recent' ? 'active' : ''}`}
+            className={`${styles['nav-item']} ${activeTab === 'recent' ? styles.active : ''}`}
             onClick={() => setActiveTab('recent')}
           >
             <Clock size={20} />
             <span>Recent</span>
           </button>
           <button
-            className={`nav-item ${activeTab === 'favorites' ? 'active' : ''}`}
+            className={`${styles['nav-item']} ${activeTab === 'favorites' ? styles.active : ''}`}
             onClick={() => setActiveTab('favorites')}
           >
             <Heart size={20} />
             <span>Favorites</span>
           </button>
           <button
-            className={`nav-item ${activeTab === 'templates' ? 'active' : ''}`}
+            className={`${styles['nav-item']} ${activeTab === 'templates' ? styles.active : ''}`}
             onClick={() => setActiveTab('templates')}
           >
             <FileText size={20} />
             <span>Templates</span>
           </button>
           <button
-            className={`nav-item ${activeTab === 'archive' ? 'active' : ''}`}
+            className={`${styles['nav-item']} ${activeTab === 'archive' ? styles.active : ''}`}
             onClick={() => setActiveTab('archive')}
           >
             <Archive size={20} />
@@ -137,18 +151,18 @@ const MainPage = () => {
       </aside>
 
       {/* 主内容区域 */}
-      <main className="main-content">
+      <main className={styles['main-content']}>
         {/* 顶部导航栏 */}
-        <header className="top-header">
-          <div className="header-spacer"></div>
-          <div className="header-actions">
-            <button className="icon-button">
+        <header className={styles['top-header']}>
+          <div className={styles['header-spacer']}></div>
+          <div className={styles['header-actions']}>
+            <button className={styles['icon-button']}>
               <Bell size={20} />
             </button>
-            <button className="icon-button">
+            <button className={styles['icon-button']}>
               <Settings size={20} />
             </button>
-            <div className="user-avatar">
+            <div className={styles['user-avatar']}>
               <img
                 src="https://via.placeholder.com/40"
                 alt="User"
@@ -158,22 +172,22 @@ const MainPage = () => {
         </header>
 
         {/* 内容区域 */}
-        <div className="content-area">
-          <div className="welcome-section">
+        <div className={styles['content-area']}>
+          <div className={styles['welcome-section']}>
             <h1>Hi, Maria!</h1>
             <p>Welcome back to your planner dashboard</p>
           </div>
 
-          <div className="section-header">
+          <div className={styles['section-header']}>
             <h2>Recent</h2>
-            <button className="view-all-btn">View all</button>
+            <button className={styles['view-all-btn']}>View all</button>
           </div>
 
           {/* 课程卡片网格 */}
-          <div className="tracks-grid">
+          <div className={styles['tracks-grid']}>
             {/* New Plan 卡片 */}
-            <div className="track-card new-plan-card">
-              <button className="new-plan-button">
+            <div className={`${styles['track-card']} ${styles['new-plan-card']}`}>
+              <button className={styles['new-plan-button']}>
                 <Plus size={32} />
               </button>
               <h3>New Plan</h3>
@@ -184,10 +198,10 @@ const MainPage = () => {
             {tracks.map(track => {
               const IconComponent = track.icon;
               return (
-                <div key={track.id} className="track-card">
-                  <div className="card-header">
+                <div key={track.id} className={styles['track-card']}>
+                  <div className={styles['card-header']}>
                     <div
-                      className="card-icon"
+                      className={styles['card-icon']}
                       style={{ backgroundColor: track.iconBg }}
                     >
                       <IconComponent
@@ -196,7 +210,7 @@ const MainPage = () => {
                       />
                     </div>
                     <button
-                      className="favorite-button"
+                      className={styles['favorite-button']}
                       onClick={() => toggleFavorite(track.id)}
                     >
                       <Heart
@@ -206,11 +220,11 @@ const MainPage = () => {
                       />
                     </button>
                   </div>
-                  <h3 className="card-title">{track.title}</h3>
-                  <p className="card-course">{track.course}</p>
-                  <div className="card-footer">
-                    <span className="update-time">Updated {track.updated}</span>
-                    <span className="progress-text">{track.progress}% complete</span>
+                  <h3 className={styles['card-title']}>{track.title}</h3>
+                  <p className={styles['card-course']}>{track.course}</p>
+                  <div className={styles['card-footer']}>
+                    <span className={styles['update-time']}>Updated {track.updated}</span>
+                    <span className={styles['progress-text']}>{track.progress}% complete</span>
                   </div>
                 </div>
               );
