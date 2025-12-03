@@ -25,6 +25,9 @@ build/
 *~
 .DS_Store
 
+# Claude
+.claude/
+
 # OS
 .DS_Store
 .DS_Store?
