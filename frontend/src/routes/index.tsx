@@ -5,17 +5,13 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <MainPage />,
-    children: [
-      {
-        index: true,
-        path: '',
-      },
-      {
-        path: 'favorites',
-      },
-      {
-        path: 'archive',
-      },
-    ],
+  },
+  {
+    path: '/favorites',
+    element: <MainPage />,
+  },
+  {
+    path: '/archive',
+    element: <MainPage />,
   },
 ]);

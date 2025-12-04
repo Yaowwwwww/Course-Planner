@@ -4,9 +4,9 @@ import styles from '../styles/MainPage.module.css';
 
 interface FavoritesPageProps {
   tracks: Track[];
-  favorites: Record<number, boolean>;
-  toggleFavorite: (id: number) => void;
-  toggleArchive: (id: number) => void;
+  favorites: Record<string, boolean>;
+  toggleFavorite: (id: string) => void | Promise<void>;
+  toggleArchive: (id: string) => void | Promise<void>;
 }
 
 const FavoritesPage = ({ tracks, favorites, toggleFavorite, toggleArchive }: FavoritesPageProps) => {
