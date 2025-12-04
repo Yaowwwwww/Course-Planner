@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import {
   Clock,
   Heart,
   FileText,
   Archive,
-  Plus,
   Bell,
   Settings,
   Computer,
@@ -12,91 +13,149 @@ import {
   Beaker,
   BookOpen,
   Brain,
-  LucideIcon
 } from 'lucide-react';
-import styles from './MainPage.module.css';
-
-interface Track {
-  id: number;
-  title: string;
-  course: string;
-  icon: LucideIcon;
-  iconBg: string;
-  iconColor: string;
-  updated: string;
-  progress: number;
-  favorite: boolean;
-}
-
-type TabType = 'recent' | 'favorites' | 'templates' | 'archive';
+import { Track, TabType } from '../types/Track';
+import RecentPage from './RecentPage';
+import FavoritesPage from './FavoritesPage';
+import ArchivePage from './ArchivePage';
+import styles from '../styles/MainPage.module.css';
 
 const MainPage = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('recent');
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const tracks: Track[] = [
+  // 根据URL路径确定当前tab
+  const getActiveTab = (): TabType => {
+    const path = location.pathname;
+    if (path === '/favorites') return 'favorites';
+    if (path === '/archive') return 'archive';
+    return 'recent';
+  };
+
+  const [activeTab, setActiveTab] = useState<TabType>(getActiveTab());
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 监听URL变化,更新activeTab
+  useEffect(() => {
+    setActiveTab(getActiveTab());
+  }, [location.pathname]);
+
+  // 模拟数据 - 后端API准备好后会替换
+  const mockTracks: Track[] = [
     {
       id: 1,
       title: 'Track 1',
-      course: 'Data Structures & Algorithms',
+      course: 'Computer Science',
       icon: Computer,
       iconBg: '#E3F2FD',
       iconColor: '#2196F3',
       updated: '2 days ago',
       progress: 75,
-      favorite: false
+      favorite: false,
+      archived: false
     },
     {
       id: 2,
       title: 'Track 2',
-      course: 'Calculus III & Linear Algebra',
+      course: 'Data Science',
       icon: Calculator,
       iconBg: '#E8F5E9',
       iconColor: '#4CAF50',
       updated: '1 week ago',
       progress: 60,
-      favorite: true
+      favorite: true,
+      archived: false
     },
     {
       id: 3,
       title: 'Track 3',
-      course: 'Organic Chemistry II',
-      icon: Beaker,
-      iconBg: '#F3E5F5',
-      iconColor: '#9C27B0',
+      course: 'Mathematics',
+      icon: Calculator,
+      iconBg: '#FEF3C7',
+      iconColor: '#F59E0B',
       updated: '3 days ago',
       progress: 45,
-      favorite: false
+      favorite: false,
+      archived: false
     },
     {
       id: 4,
       title: 'Track 4',
-      course: 'Modern American Literature',
+      course: 'Music',
       icon: BookOpen,
-      iconBg: '#FFF3E0',
-      iconColor: '#FF9800',
+      iconBg: '#FECDD3',
+      iconColor: '#F43F5E',
       updated: '5 days ago',
       progress: 90,
-      favorite: true
+      favorite: true,
+      archived: false
     },
     {
       id: 5,
       title: 'Track 5',
-      course: 'Cognitive Psychology',
+      course: 'Art',
+      icon: Beaker,
+      iconBg: '#DDD6FE',
+      iconColor: '#8B5CF6',
+      updated: '1 week ago',
+      progress: 30,
+      favorite: false,
+      archived: false
+    },
+    {
+      id: 6,
+      title: 'Track 6',
+      course: 'Cognitive Science',
       icon: Brain,
       iconBg: '#EDE7F6',
       iconColor: '#673AB7',
-      updated: '1 week ago',
-      progress: 30,
-      favorite: false
+      updated: '4 days ago',
+      progress: 55,
+      favorite: false,
+      archived: false
     }
   ];
 
-  const [favorites, setFavorites] = useState<Record<number, boolean>>(
-    tracks.reduce((acc, track) => {
-      acc[track.id] = track.favorite;
-      return acc;
-    }, {} as Record<number, boolean>)
-  );
+  // useEffect: 页面加载时获取tracks数据
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        setLoading(true);
+
+        // TODO: 后端API准备好后,取消注释并填入正确的URL
+        // const response = await axios.get('YOUR_API_URL_HERE/tracks');
+        // setTracks(response.data);
+
+        // 暂时使用模拟数据
+        // 模拟网络延迟
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setTracks(mockTracks);
+
+      } catch (error) {
+        console.error('获取tracks数据失败:', error);
+        // 出错时使用模拟数据
+        setTracks(mockTracks);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTracks();
+  }, []); // [] 表示只在组件加载时执行一次
+
+  const [favorites, setFavorites] = useState<Record<number, boolean>>({});
+
+  // 当tracks数据加载完成后,初始化favorites
+  useEffect(() => {
+    if (tracks.length > 0) {
+      const initialFavorites = tracks.reduce((acc, track) => {
+        acc[track.id] = track.favorite;
+        return acc;
+      }, {} as Record<number, boolean>);
+      setFavorites(initialFavorites);
+    }
+  }, [tracks]);
 
   const toggleFavorite = (id: number) => {
     setFavorites(prev => ({
@@ -104,6 +163,39 @@ const MainPage = () => {
       [id]: !prev[id]
     }));
   };
+
+  const toggleArchive = (id: number) => {
+    setTracks(prevTracks =>
+      prevTracks.map(track =>
+        track.id === id ? { ...track, archived: !track.archived } : track
+      )
+    );
+  };
+
+  // 加载中状态
+  if (loading) {
+    return (
+      <div className={styles['main-page']}>
+        <aside className={styles.sidebar}>
+          <div className={styles['sidebar-header']}>
+            <div className={styles.logo}>
+              <div className={styles['logo-icon']}>
+                <FileText size={24} />
+              </div>
+              <span className={styles['logo-text']}>Course Planner</span>
+            </div>
+          </div>
+        </aside>
+        <main className={styles['main-content']}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', color: '#6b7280' }}>加载中...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={styles['main-page']}>
@@ -121,28 +213,21 @@ const MainPage = () => {
         <nav className={styles['sidebar-nav']}>
           <button
             className={`${styles['nav-item']} ${activeTab === 'recent' ? styles.active : ''}`}
-            onClick={() => setActiveTab('recent')}
+            onClick={() => navigate('/')}
           >
             <Clock size={20} />
             <span>Recent</span>
           </button>
           <button
             className={`${styles['nav-item']} ${activeTab === 'favorites' ? styles.active : ''}`}
-            onClick={() => setActiveTab('favorites')}
+            onClick={() => navigate('/favorites')}
           >
             <Heart size={20} />
             <span>Favorites</span>
           </button>
           <button
-            className={`${styles['nav-item']} ${activeTab === 'templates' ? styles.active : ''}`}
-            onClick={() => setActiveTab('templates')}
-          >
-            <FileText size={20} />
-            <span>Templates</span>
-          </button>
-          <button
             className={`${styles['nav-item']} ${activeTab === 'archive' ? styles.active : ''}`}
-            onClick={() => setActiveTab('archive')}
+            onClick={() => navigate('/archive')}
           >
             <Archive size={20} />
             <span>Archive</span>
@@ -174,61 +259,45 @@ const MainPage = () => {
         {/* 内容区域 */}
         <div className={styles['content-area']}>
           <div className={styles['welcome-section']}>
-            <h1>Hi, Maria!</h1>
+            <h1>Hi, Student!</h1>
             <p>Welcome back to your planner dashboard</p>
           </div>
 
           <div className={styles['section-header']}>
-            <h2>Recent</h2>
+            <h2>
+              {activeTab === 'recent' && 'Recent'}
+              {activeTab === 'favorites' && 'Favorites'}
+              {activeTab === 'archive' && 'Archive'}
+            </h2>
             <button className={styles['view-all-btn']}>View all</button>
           </div>
 
           {/* 课程卡片网格 */}
           <div className={styles['tracks-grid']}>
-            {/* New Plan 卡片 */}
-            <div className={`${styles['track-card']} ${styles['new-plan-card']}`}>
-              <button className={styles['new-plan-button']}>
-                <Plus size={32} />
-              </button>
-              <h3>New Plan</h3>
-              <p>Create a 4-year plan</p>
-            </div>
-
-            {/* 课程卡片 */}
-            {tracks.map(track => {
-              const IconComponent = track.icon;
-              return (
-                <div key={track.id} className={styles['track-card']}>
-                  <div className={styles['card-header']}>
-                    <div
-                      className={styles['card-icon']}
-                      style={{ backgroundColor: track.iconBg }}
-                    >
-                      <IconComponent
-                        size={24}
-                        style={{ color: track.iconColor }}
-                      />
-                    </div>
-                    <button
-                      className={styles['favorite-button']}
-                      onClick={() => toggleFavorite(track.id)}
-                    >
-                      <Heart
-                        size={20}
-                        fill={favorites[track.id] ? '#f44336' : 'none'}
-                        color={favorites[track.id] ? '#f44336' : '#999'}
-                      />
-                    </button>
-                  </div>
-                  <h3 className={styles['card-title']}>{track.title}</h3>
-                  <p className={styles['card-course']}>{track.course}</p>
-                  <div className={styles['card-footer']}>
-                    <span className={styles['update-time']}>Updated {track.updated}</span>
-                    <span className={styles['progress-text']}>{track.progress}% complete</span>
-                  </div>
-                </div>
-              );
-            })}
+            {activeTab === 'recent' && (
+              <RecentPage
+                tracks={tracks}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+                toggleArchive={toggleArchive}
+              />
+            )}
+            {activeTab === 'favorites' && (
+              <FavoritesPage
+                tracks={tracks}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+                toggleArchive={toggleArchive}
+              />
+            )}
+            {activeTab === 'archive' && (
+              <ArchivePage
+                tracks={tracks}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+                toggleArchive={toggleArchive}
+              />
+            )}
           </div>
         </div>
       </main>
