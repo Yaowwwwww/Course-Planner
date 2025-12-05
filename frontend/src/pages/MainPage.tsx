@@ -4,7 +4,6 @@ import axios from 'axios';
 import {
   Clock,
   Heart,
-  FileText,
   Archive,
   Bell,
   Settings,
@@ -20,6 +19,7 @@ import RecentPage from './RecentPage';
 import FavoritesPage from './FavoritesPage';
 import ArchivePage from './ArchivePage';
 import styles from '../styles/MainPage.module.css';
+import smcLogo from '../assets/SMClogo.png';
 
 const API_BASE_URL = 'http://localhost:5001/api';
 
@@ -66,8 +66,8 @@ const MainPage = () => {
   // 根据URL路径确定当前tab
   const getActiveTab = (): TabType => {
     const path = location.pathname;
-    if (path === '/favorites') return 'favorites';
-    if (path === '/archive') return 'archive';
+    if (path === '/planner/favorites') return 'favorites';
+    if (path === '/planner/archive') return 'archive';
     return 'recent';
   };
 
@@ -175,11 +175,11 @@ const MainPage = () => {
       <div className={styles['main-page']}>
         <aside className={styles.sidebar}>
           <div className={styles['sidebar-header']}>
-            <div className={styles.logo}>
+            <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
               <div className={styles['logo-icon']}>
-                <FileText size={24} />
+                <img src={smcLogo} alt="Logo" />
               </div>
-              <span className={styles['logo-text']}>Course Planner</span>
+              <span className={styles['logo-text']}>Course Planner@Berkeley</span>
             </div>
           </div>
         </aside>
@@ -199,32 +199,32 @@ const MainPage = () => {
       {/* 左侧导航栏 */}
       <aside className={styles.sidebar}>
         <div className={styles['sidebar-header']}>
-          <div className={styles.logo}>
+          <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <div className={styles['logo-icon']}>
-              <FileText size={24} />
+              <img src={smcLogo} alt="Logo" />
             </div>
-            <span className={styles['logo-text']}>Course Planner</span>
+            <span className={styles['logo-text']}>Course Planner@Berkeley</span>
           </div>
         </div>
 
         <nav className={styles['sidebar-nav']}>
           <button
             className={`${styles['nav-item']} ${activeTab === 'recent' ? styles.active : ''}`}
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/planner')}
           >
             <Clock size={20} />
             <span>Recent</span>
           </button>
           <button
             className={`${styles['nav-item']} ${activeTab === 'favorites' ? styles.active : ''}`}
-            onClick={() => navigate('/favorites')}
+            onClick={() => navigate('/planner/favorites')}
           >
             <Heart size={20} />
             <span>Favorites</span>
           </button>
           <button
             className={`${styles['nav-item']} ${activeTab === 'archive' ? styles.active : ''}`}
-            onClick={() => navigate('/archive')}
+            onClick={() => navigate('/planner/archive')}
           >
             <Archive size={20} />
             <span>Archive</span>
@@ -245,10 +245,11 @@ const MainPage = () => {
               <Settings size={20} />
             </button>
             <div className={styles['user-avatar']}>
-              <img
-                src="https://via.placeholder.com/40"
-                alt="User"
-              />
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="20" fill="#E5E7EB"/>
+                <circle cx="20" cy="15" r="6" fill="#9CA3AF"/>
+                <path d="M8 35C8 28.9249 12.9249 24 19 24H21C27.0751 24 32 28.9249 32 35V40H8V35Z" fill="#9CA3AF"/>
+              </svg>
             </div>
           </div>
         </header>
